@@ -1,0 +1,1 @@
+hadoop jar /home/cloudera/Desktop/StationTemp.jar ExtraCreditLab input NCDC-Weather_small.txt output
