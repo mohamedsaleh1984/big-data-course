@@ -1,0 +1,21 @@
+{
+	"type": "record",
+	"name": "WeatherRecord",
+	"doc": "A Max Temperature Reading.",
+	"fields": [
+		{
+			"name":"Year",
+			"type":"int",
+			"order":"descending"
+		},
+		{
+			"name":"MaxTemp",
+			"type":"float"
+		},
+		
+		{
+			"name":"StationId",
+			"type":"string"
+		}
+	]
+}
