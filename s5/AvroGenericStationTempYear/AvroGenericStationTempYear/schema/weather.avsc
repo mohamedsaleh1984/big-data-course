@@ -5,11 +5,13 @@
 	"fields": [
 		{
 			"name":"stationId",
-			"type":"string"
+			"type":"string",
+			"order":"ascending"
 		},
 		{
 			"name":"temperature",
-			"type":"float"
+			"type":"float",
+			"order":"descending"
 		},
 		{
 			"name":"year",
