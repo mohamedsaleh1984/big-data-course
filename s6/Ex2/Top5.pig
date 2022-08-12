@@ -1,0 +1,10 @@
+users_data =  LOAD 'users.csv' AS (user:chararray,age:int);
+access_data =  LOAD 'pages.csv' AS (website:chararray, user:chararray);
+filtered_users = FILTER users_data BY age >= 18 AND age <= 25;
+transtable = JOIN filtered_users BY user, access_data BY user;
+data_for_grouping = FOREACH transtable  GENERATE $0,$2;
+groupBag= GROUP data_for_grouping BY website;
+site_visits = FOREACH groupBag GENERATE $0,COUNT($1);
+sortedList = ORDER site_visits BY $1 DESC;
+firstFive = LIMIT sortedList 5;
+STORE firstFive INTO 'top5' USING PigStorage(',');

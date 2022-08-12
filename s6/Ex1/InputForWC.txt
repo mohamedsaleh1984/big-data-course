@@ -1,0 +1,3 @@
+Java	Hadoop	Pig	BDT
+Pig	Java	Hadoop
+Mapreduce	BDT Java Hadoop
