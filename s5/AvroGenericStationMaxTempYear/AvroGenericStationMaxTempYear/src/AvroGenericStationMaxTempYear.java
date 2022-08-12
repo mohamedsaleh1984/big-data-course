@@ -1,8 +1,10 @@
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
@@ -26,6 +28,7 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
+
 public class AvroGenericStationMaxTempYear extends Configured implements Tool
 {
 	private static Schema SCHEMA;
@@ -37,10 +40,6 @@ public class AvroGenericStationMaxTempYear extends Configured implements Tool
 		private NcdcLineReaderUtils utils = new NcdcLineReaderUtils();
 		private GenericRecord record = new GenericData.Record(SCHEMA);
 		AvroKey<GenericRecord> avroKey = new AvroKey<GenericRecord>(record);
-		//Keep Track of Temp Changes
-		HashMap<Integer,Float> YearTempTracker = new HashMap<Integer, Float>();
-		HashMap<Integer,String> YearStationTracker = new HashMap<Integer, String>();
-		
 		
 		@Override
 		protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException
@@ -49,51 +48,36 @@ public class AvroGenericStationMaxTempYear extends Configured implements Tool
 
 			if (utils.isValidTemperature())
 			{
-				 
 				String incomingStationId = utils.getStationId();
 				float incomingTemp = utils.getAirTemperature();
 				int incomingYear = utils.getYearInt();
 				
-				if(YearTempTracker.containsValue(incomingYear)){
-					if(incomingTemp > YearTempTracker.get(incomingYear)){
-						YearTempTracker.put (incomingYear, incomingTemp);
-						YearStationTracker.put(incomingYear,incomingStationId);
-					}
-				}else{
-					YearTempTracker.put(incomingYear, incomingTemp);
-					YearStationTracker.put(incomingYear,incomingStationId);
-				}
-			}
-		}
-		
-		@Override
-		protected void cleanup(
-				Mapper<LongWritable, Text, AvroKey<GenericRecord>, NullWritable>.Context context)
-				throws IOException, InterruptedException {
-			for(Integer yearKey : YearTempTracker.keySet()){
-				record.put("StationId", YearStationTracker.get(yearKey));
-				record.put("MaxTemp", YearTempTracker.get(yearKey));
-				record.put("Year", yearKey);				
+				record.put("StationId",incomingStationId);
+				record.put("MaxTemp", incomingTemp);
+				record.put("Year",incomingYear);
+				
 				context.write(new AvroKey<GenericRecord>(record), NullWritable.get());
-			}	 
+			}
 		}
 	}
 	
-
 	public static class AvroReducer extends Reducer<AvroKey<GenericRecord>, FloatWritable, AvroKey<GenericRecord>, NullWritable>
 	{
-		@Override
-		protected void setup(
-				Reducer<AvroKey<GenericRecord>, FloatWritable, AvroKey<GenericRecord>, NullWritable>.Context context)
-				throws IOException, InterruptedException {
-			
-		}
+		private HashSet<Integer> mySet = new HashSet<Integer>(); 
 		
 		@Override
 		protected void reduce(AvroKey<GenericRecord> key, Iterable<FloatWritable> values,
 				Context context) throws IOException, InterruptedException
-		{		 
-			context.write(key, NullWritable.get());
+		{
+			int yearValue = (int) key.datum().get(0);
+			if(!mySet.contains(yearValue)){
+				mySet.add(yearValue);
+				context.write(key, NullWritable.get());
+				System.out.println("MAX OF " + key.datum().get(0) + " " + key.datum().get(1) + " " );
+			}else{
+				System.out.println("Ignored");
+				System.out.println(key.datum().get(0) + " " + key.datum().get(1) + " " );
+			}
 		}
 	}
 
