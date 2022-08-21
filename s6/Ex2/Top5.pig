@@ -1,6 +1,6 @@
 users_data =  LOAD 'users.csv' AS (user:chararray,age:int);
 access_data =  LOAD 'pages.csv' AS (website:chararray, user:chararray);
-filtered_users = FILTER users_data BY age >= 18 AND age <= 25;
+filtered_users = FILTER users_data BY (age >= 18) AND (age <= 25);
 transtable = JOIN filtered_users BY user, access_data BY user;
 data_for_grouping = FOREACH transtable  GENERATE $0,$2;
 groupBag= GROUP data_for_grouping BY website;

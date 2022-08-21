@@ -1,0 +1,12 @@
+CREATE EXTERNAL TABLE EmployeeData(empName STRING,jobTitle STRING,dpt STRING,jobType STRING,incomeType STRING,hours INT,
+annualSalary DOUBLE,hourlyRate DECIMAL(4,2))  
+ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde' 
+WITH SERDEPROPERTIES('separatorChar' = ',','quoteChar' = '\"','escapeChar' = '\\')  
+STORED AS TEXTFILE LOCATION '/home/cloudera/cs523/input/ChicagoEmployeesDataset.csv' 
+TBLPROPERTIES ('skip.header.line.count' = '1');
+
+LOAD DATA LOCAL INPATH '/home/cloudera/cs523/input/ChicagoEmployeesDataset.csv'  OVERWRITE INTO TABLE EmployeeData;
+
+INSERT OVERWRITE LOCAL DIRECTORY '/home/cloudera/hiveOutput' ROW FORMAT DELIMITED  FIELDS TERMINATED BY '\t'
+SELECT dpt, AVG(annualSalary) AS avgSalary FROM EmployeeData  WHERE incomeType='Salary' AND annualSalary is not null GROUP BY dpt;
+

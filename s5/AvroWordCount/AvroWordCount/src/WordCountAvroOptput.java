@@ -86,7 +86,17 @@ public class WordCountAvroOptput extends Configured implements Tool
 		
 		AvroJob.setOutputKeySchema(job, Schema.create(Type.STRING));
 		AvroJob.setOutputValueSchema(job, Schema.create(Type.INT));
+
 		
+		//job.setMapOutputKeyClass(Text.class);
+		//job.setMapOutputValueClass(IntWritable.class);
+
+		//AvroJob.setOutputKeySchema(job, Schema.create(Type.STRING));
+		//AvroJon.setOutputValueSchema(job,Schema.create(Type.INT));
+
+		//job.setOutputFormatClass(AvroKeyValueOutputFormat.Class);
+
+
 		return job.waitForCompletion(true) ? 0 : 1;
 	}
 

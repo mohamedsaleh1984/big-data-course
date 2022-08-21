@@ -73,10 +73,6 @@ public class AvroGenericStationMaxTempYear extends Configured implements Tool
 			if(!mySet.contains(yearValue)){
 				mySet.add(yearValue);
 				context.write(key, NullWritable.get());
-				System.out.println("MAX OF " + key.datum().get(0) + " " + key.datum().get(1) + " " );
-			}else{
-				System.out.println("Ignored");
-				System.out.println(key.datum().get(0) + " " + key.datum().get(1) + " " );
 			}
 		}
 	}
@@ -105,14 +101,13 @@ public class AvroGenericStationMaxTempYear extends Configured implements Tool
 
 		job.setMapperClass(AvroMapper.class);
 		job.setReducerClass(AvroReducer.class);
-		
-		
+
+
 		job.setMapOutputValueClass(NullWritable.class);
-		
-		AvroJob.setMapOutputKeySchema(job, SCHEMA);  
-		AvroJob.setOutputKeySchema(job,SCHEMA); 
-		
 		job.setOutputFormatClass(AvroKeyOutputFormat.class);
+		AvroJob.setMapOutputKeySchema(job, SCHEMA);  
+		AvroJob.setOutputKeySchema(job,SCHEMA); 		
+		
 
 		return job.waitForCompletion(true) ? 0 : 1;
 	}

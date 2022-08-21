@@ -1,0 +1,14 @@
+CREATE EXTERNAL TABLE EmployeeData(empName STRING,jobTitle STRING,dpt STRING,jobType STRING,incomeType STRING,hours INT,
+annualSalary DOUBLE,hourlyRate DECIMAL(4,2))  
+ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde' 
+WITH SERDEPROPERTIES('separatorChar' = ',','quoteChar' = '\"','escapeChar' = '\\')  
+STORED AS TEXTFILE LOCATION '/home/cloudera/cs523/input/ChicagoEmployeesDataset.csv' 
+TBLPROPERTIES ('skip.header.line.count' = '1');
+
+LOAD DATA LOCAL INPATH '/home/cloudera/cs523/input/ChicagoEmployeesDataset.csv'  OVERWRITE INTO TABLE EmployeeData;
+
+INSERT OVERWRITE LOCAL DIRECTORY '/home/cloudera/hiveOutput' ROW FORMAT DELIMITED  FIELDS TERMINATED BY '\t'
+Select Tbl.empName,Tbl.dpt,Tbl.annualSalary  From (
+Select empname,dpt,annualsalary,
+row_number() over(PARTITION BY dpt ORDER BY annualsalary DESC) as RowRank
+From employeedata) Tbl WHERE Tbl.RowRank = 1 limit 10;

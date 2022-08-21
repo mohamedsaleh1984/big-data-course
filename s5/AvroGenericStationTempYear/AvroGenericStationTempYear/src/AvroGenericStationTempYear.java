@@ -27,6 +27,10 @@ public class AvroGenericStationTempYear extends Configured implements Tool
 
 	private static Schema SCHEMA;
 
+	//SCHEMA = new Schema.Parser().parse(new File(schemaPath));
+	//GenericRecord record = new GenericData.Record(SCHEMA);
+	//AvroKey<GenericRecord> avroKey = new AvroKey<GenericRecord>(record);
+
 	public static class AvroMapper extends Mapper<LongWritable, Text, AvroKey<GenericRecord>, NullWritable>
 	{
 		private NcdcLineReaderUtils utils = new NcdcLineReaderUtils();
@@ -47,6 +51,12 @@ public class AvroGenericStationTempYear extends Configured implements Tool
 				avroKey.datum(record);
 				context.write(avroKey, NullWritable.get());
 			}
+			/*
+			 	record.put("studentId", utils.getStudentId());
+			 	record.put("stdName",utils.getName());
+			 	avroKey.datum(record);
+				context.write(avroKey,Nullwritable.get());
+			 */
 		}
 	}
 
@@ -94,6 +104,11 @@ public class AvroGenericStationTempYear extends Configured implements Tool
 		job.setOutputFormatClass(AvroKeyOutputFormat.class);
 
 		return job.waitForCompletion(true) ? 0 : 1;
+		/*
+		 * 
+		 * 
+		 * 
+		 */
 	}
 
 	public static void main(String[] args) throws Exception
