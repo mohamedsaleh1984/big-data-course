@@ -1,0 +1,10 @@
+import scala.io.Source
+
+val filename = "/usr/lib/spark/LICENSE"
+var counter = 0
+for (line <- Source.fromFile(filename).getLines) {
+    val ok = line.contains("BSD");
+    if( ok)
+	counter = counter +1
+}
+println(counter)
